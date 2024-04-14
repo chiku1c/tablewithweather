@@ -139,8 +139,16 @@ const Datatable = () => {
     manualSorting: true,
     muiTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
-        console.log(event, row?.original?.coordinates);
-        navigate(`/weather-details/${row?.original?.name}/${row?.original?.coordinates?.lat}/${row?.original?.coordinates?.lon}`)
+        if (event.ctrlKey || event.metaKey) { // Check if Ctrl (Windows/Linux) or Cmd (Mac) is pressed
+          window.open(`/weather-details/${row?.original?.name}/${row?.original?.coordinates?.lat}/${row?.original?.coordinates?.lon}`, '_blank');
+        } else {
+          console.log(event, row?.original?.coordinates);
+          navigate(`/weather-details/${row?.original?.name}/${row?.original?.coordinates?.lat}/${row?.original?.coordinates?.lon}`);
+        }
+      },
+      onContextMenu: (event) => {
+        event.preventDefault(); // Prevent default right-click behavior
+        window.open(`/weather-details/${row?.original?.name}/${row?.original?.coordinates?.lat}/${row?.original?.coordinates?.lon}`, '_blank');
       },
       sx: {
         cursor: 'pointer',
