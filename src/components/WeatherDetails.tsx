@@ -18,23 +18,31 @@ const WeatherPage: React.FC = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchWeatherData = async () => {
-      try {
-        const mode = 'cors'; // Set the desired mode (json/xml/html)
-        const response = await fetch(
-          `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&mode=${mode}&appid=4b2d1a230332e3534169b37e6dde4668`
-        );
-        const data = await response.json();
+    const fetchWeatherData = () => {
+      const script = document.createElement('script');
+      script.src = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=4b2d1a230332e3534169b37e6dde4668&callback=handleWeatherData`;
+
+      (window as any).handleWeatherData = (data: WeatherData) => {
         setWeather(data);
         setLoading(false);
-      } catch (error) {
+      };
+
+      script.onerror = () => {
         setError('Error fetching weather data');
         setLoading(false);
-      }
+      };
+
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+        delete (window as any).handleWeatherData;
+      };
     };
-  
+
     fetchWeatherData();
   }, [lat, lon]);
+
   
 
   const getBackground = () => {
